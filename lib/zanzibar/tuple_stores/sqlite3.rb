@@ -1,6 +1,6 @@
 module Zanzibar
-  module TupleFinders
-    class Sqlite
+  module TupleStores
+    class SQLite3
       CHECK_QUERY = <<-SQL
       SELECT
           object,
@@ -19,10 +19,22 @@ module Zanzibar
           subject_relation NULLS FIRST
       SQL
 
-      def self.find(p_subject_namespace, p_subject, p_relation, p_object_namespace, p_object)
+      def initialize(file, table)
+        require 'sqlite3'
+
+        db = ::SQLite3::Database.new(file)
+        db.results_as_hash = true
+
+        @db = db
+
+        @table = table
+      end
+
+      def find(p_subject_namespace, p_subject, p_relation, p_object_namespace, p_object)
         p [:query, [p_subject_namespace, p_subject, p_relation, p_object_namespace, p_object]]
         p [p_object_namespace, p_object, p_relation]
-        $db.execute(CHECK_QUERY, [p_object_namespace, p_object, p_relation]) do |var_r|
+
+        @db.execute(CHECK_QUERY, [p_object_namespace, p_object, p_relation]) do |var_r|
           p var_r
           if var_r['subject'] == p_subject && var_r['subject_namespace'] == p_subject_namespace
             return true

@@ -1,6 +1,5 @@
 require_relative "./internal_evaler"
-# TODO: make TupleFinders::Sqlite configurable via Policy
-require_relative "./tuple_finders/sqlite.rb"
+require_relative "./tuple_stores/nop"
 
 module Zanzibar
   module Behavior
@@ -16,11 +15,16 @@ module Zanzibar
     end
 
     module ClassMethods
+      def tuples_store(it)
+        @tuple_store = it
+      end
+
       def define(r, as:)
+        tuple_store = @tuple_store || TupleStores::Nop.new
+
         define_method r do |args|
           p [:policy_proc_check, r, args]
-          # TODO: make TupleFinders::Sqlite configurable via Policy
-          InternalEvaler.new(r, as, self, TupleFinders::Sqlite, args).eval
+          InternalEvaler.new(r, as, self, tuple_store, args).eval
         end
       end
     end

@@ -21,9 +21,9 @@ module Zanzibar
     def _self
       subject, subject_id, relation, object, object_id = @args
       new_args = [subject, subject_id, @r.to_s, object, object_id]
-      p [:tuple_finder_find, new_args]
+      p [:tuple_store_find, new_args]
       res = @tuple_finder.find(*new_args)
-      p [:tuple_finder_find, new_args, res]
+      p [:tuple_store_find, new_args, res]
       res
     end
   end
